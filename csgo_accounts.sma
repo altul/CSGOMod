@@ -32,13 +32,13 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("csgo_accounts_password_min_length", "5"), passwordMinLength);
 	bind_pcvar_string(create_cvar("csgo_accounts_setinfo", "csgopass"), setinfo, charsmax(setinfo));
 
-	register_clcmd("WPROWADZ_SWOJE_HASLO", "login_account");
-	register_clcmd("WPROWADZ_WYBRANE_HASLO", "register_step_one");
-	register_clcmd("POWTORZ_WYBRANE_HASLO", "register_step_two");
-	register_clcmd("WPROWADZ_AKTUALNE_HASLO", "change_step_one");
-	register_clcmd("WPROWADZ_NOWE_HASLO", "change_step_two");
-	register_clcmd("POWTORZ_NOWE_HASLO", "change_step_three");
-	register_clcmd("WPROWADZ_SWOJE_AKTUALNE_HASLO", "delete_account");
+	register_clcmd("ENTER_YOUR_PASSWORD", "login_account");
+	register_clcmd("ENTER_THE_SELECTED_PASSWORD", "register_step_one");
+	register_clcmd("REPEAT_THE_SELECTED_PASSWORD", "register_step_two");
+	register_clcmd("ENTER_THE_CURRENT_PASSWORD", "change_step_one");
+	register_clcmd("ENTER_NEW_PASSWORD", "change_step_two");
+	register_clcmd("REPEAT_NEW_PASSWORD", "change_step_three");
+	register_clcmd("ENTER_YOUR_CURRENT_PASSWORD", "delete_account");
 
 	register_concmd("joinclass", "check_account");
 	register_concmd("jointeam", "check_account");
@@ -147,7 +147,7 @@ public kick_player(id)
 {
 	id -= TASK_PASSWORD;
 
-	if (is_user_connected(id)) server_cmd("kick #%d ^"Nie zalogowales sie w ciagu %is!^"", get_user_userid(id), loginMaxTime);
+	if (is_user_connected(id)) server_cmd("kick #%d ^"You have not logged in within %is!^"", get_user_userid(id), loginMaxTime);
 }
 
 public account_menu(id)
@@ -173,19 +173,19 @@ public account_menu(id)
 
 	static menuData[256];
 
-	formatex(menuData, charsmax(menuData), "\rSYSTEM REJESTRACJI^n^n\rNick: \w[\y%s\w]^n\rStatus: \w[\y%s\w]", playerData[id][NAME], accountStatus[playerData[id][STATUS]]);
+	formatex(menuData, charsmax(menuData), "\rREGISTRATION SYSTEM^n^n\rNick: \w[\y%s\w]^n\rStatus: \w[\y%s\w]", playerData[id][NAME], accountStatus[playerData[id][STATUS]]);
 
-	if ((playerData[id][STATUS] == NOT_LOGGED || playerData[id][STATUS] == LOGGED) && !get_bit(id, autoLogin)) format(menuData, charsmax(menuData),"%s^n\wWpisz w konsoli \ysetinfo ^"_%s^" ^"twojehaslo^"^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, setinfo);
+	if ((playerData[id][STATUS] == NOT_LOGGED || playerData[id][STATUS] == LOGGED) && !get_bit(id, autoLogin)) format(menuData, charsmax(menuData),"%s^n\wEnter in console \ysetinfo ^"_%s^" ^"your password^"^n\wThis will load your password \automatically\w.", menuData, setinfo);
 
 	new menu = menu_create(menuData, "account_menu_handle"), callback = menu_makecallback("account_menu_callback");
 
-	menu_additem(menu, "\yLogowanie", _, _, callback);
-	menu_additem(menu, "\yRejestracja^n", _, _, callback);
-	menu_additem(menu, "\yZmien \wHaslo", _, _, callback);
-	menu_additem(menu, "\ySkasuj \wKonto^n", _, _, callback);
-	menu_additem(menu, "\yZaloguj jako \wGosc \r(NIEZALECANE)^n", _, _, callback);
+	menu_additem(menu, "\yLogin", _, _, callback);
+	menu_additem(menu, "\yRegistration^n", _, _, callback);
+	menu_additem(menu, "\yChange \wPassword", _, _, callback);
+	menu_additem(menu, "\yClear \wAccount^n", _, _, callback);
+	menu_additem(menu, "\yLogin as \wGuest \r(NOT RECOMMENDED)^n", _, _, callback);
 
-	if (playerData[id][STATUS] == LOGGED) menu_additem(menu, "\wWyjdz", _, _, callback);
+	if (playerData[id][STATUS] == LOGGED) menu_additem(menu, "\wExit", _, _, callback);
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -219,20 +219,20 @@ public account_menu_handle(id, menu, item)
 	switch(item)
 	{
 		case 0: {
-			client_print_color(id, id, "^x04[CS:GO]^x01 Wprowadz swoje^x04 haslo^x01, aby sie^x04 zalogowac.");
+			client_print_color(id, id, "^x04[CS:GO]^x01 Enter yours^x04 password^x01, to myself^x04 log.");
 
 			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz swoje haslo.");
+			show_hudmessage(id, "Enter your password.");
 
-			client_cmd(id, "messagemode WPROWADZ_SWOJE_HASLO");
+			client_cmd(id, "messagemode ENTER_YOUR_PASSWORD");
 		}
 		case 1: {
-			client_print_color(id, id, "^x04[CS:GO]^x01 Rozpoczales proces^x04 rejestracji^x01. Wprowadz wybrane^x04 haslo^x01.");
+			client_print_color(id, id, "^x04[CS:GO]^x01 You started the process^x04 registration^x01. Enter selected^x04 password^x01.");
 
 			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz swoje haslo.");
+			show_hudmessage(id, "Enter your password.");
 
-			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
+			client_cmd(id, "messagemode ENTER_THE_SELECTED_PASSWORD");(aici am ramas)
 
 			remove_task(id + TASK_PASSWORD);
 		}
